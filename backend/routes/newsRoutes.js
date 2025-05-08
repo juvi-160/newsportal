@@ -6,6 +6,7 @@ const {
   getNewsById,
   updateNews,
   deleteNews,
+  getNewsCounts,
 } = require("../controllers/newsController");
 const upload = require('../middlleware/multer')
 
@@ -14,6 +15,9 @@ router.post("/create", upload.single("image"), createNews);
 
 // Get all news
 router.get("", getAllNews);
+
+//get count
+router.get("/count", getNewsCounts);
 
 //Get news By Id
 router.get("/:id", getNewsById);

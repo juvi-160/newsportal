@@ -1,11 +1,12 @@
-const sequelize = require('../config/db');
+// const sequelize = require('../config/db');
 const News = require("../models/newsModel");
+const Category = require("../models/categoryModel")
 
-// Sync DB
-sequelize
-.sync({ alter: true })
-.then(() => console.log("Database & tables synced!"))
-.catch((err) => console.error("Error syncing database:", err.message));
+// // Sync DB
+// sequelize
+// .sync({ alter: true })
+// .then(() => console.log("Database & tables synced!"))
+// .catch((err) => console.error("Error syncing database:", err.message));
 
 //create function
 const createNews = async (req, res) => {
@@ -90,6 +91,31 @@ const deleteNews = async (req, res) => {
   }
 };
 
+// Get news count by category
+const getNewsCounts = async (req, res) => {
+  try {
+    const total = await News.count();
+    const categories = await Category.findAll();
+    const counts = { total };
+    
+    for (const category of categories) {
+      counts[category.name.toLowerCase()] = await News.count({
+        where: { categoryId: category.id }
+      });
+    }
+
+    res.json({
+      success: true,
+      ...counts
+    });
+  } catch (error) {
+    console.error('Error getting news counts:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get news counts'
+    });
+  }
+};
 
 module.exports = {
   createNews,
@@ -97,4 +123,6 @@ module.exports = {
   getNewsById,
   updateNews,
   deleteNews,
+  getNewsCounts,
+  
 };

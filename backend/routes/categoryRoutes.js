@@ -12,15 +12,45 @@ router.post("/", async (req, res) => {
   }
 });
 
-//read all
+// Get all categories
 router.get("/", async (req, res) => {
   try {
-    const categories = await Category.findAll();
-    res.json({ success: true, categories });
+    const categories = await Category.findAll({
+      order: [['createdAt', 'DESC']] // Optional: sort by creation date
+    });
+    res.json({ 
+      success: true, 
+      categories,
+      count: categories.length // Include count in the response
+    });
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    res.status(500).json({ 
+      success: false, 
+      message: error.message 
+    });
   }
 });
+
+// Get category count
+router.get("/count", async (req, res) => {
+  try {
+    // Just get the total count of categories
+    const count = await Category.count();
+    
+    res.json({
+      success: true,
+      count
+    });
+  } catch (error) {
+    console.error('Error getting category count:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get category count',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
 
 // Update
 router.put("/:id", async (req, res) => {

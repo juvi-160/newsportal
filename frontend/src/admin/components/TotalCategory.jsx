@@ -1,14 +1,36 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import StatsCard from './StatsCard';
 
 const TotalCategory = () => {
-  return (
-    <>
-    <div className='bg-amber-100 rounded-2xl p-10'>
-      <h1 className='font-bold text-2xl'>TOTAL CATEGORIES</h1>
-      <p>50</p>
-    </div>
-    </>
-  )
-}
+  const [count, setCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-export default TotalCategory
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('/categories/count'); // Correct endpoint
+        setCount(response.data.count); // Directly use the count value
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching category count:", err);
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  return (
+    <StatsCard 
+      title="TOTAL CATEGORIES" 
+      count={count} 
+      loading={loading}
+      error={error}
+    />
+  );
+};
+
+export default TotalCategory;

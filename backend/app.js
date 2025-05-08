@@ -1,11 +1,18 @@
 const express = require("express");
 const cors = require("cors");
-const dotenv = require('dotenv');
-dotenv.config();
 const sequelize = require("./config/db");
 const PORT = process.env.PORT;
+
+//models
+const News = require("./models/newsModel");
+const User = require("./models/userModel"); 
+const Category = require("./models/categoryModel");
+
+const newsRoutes = require("./routes/newsRoutes");
+const userRoutes = require("./routes/userRoutes")
+const categoryRoutes = require("./routes/categoryRoutes")
+
 const app = express();
-const bodyParser = require("body-parser");
 
 async function testConnection() {
   try {
@@ -21,15 +28,14 @@ testConnection();
 
 //middleware
 app.use(express.json());
-app.use(cors());
-app.use(bodyParser.urlencoded({
+app.use(cors({  origin: 'http://localhost:5173', // Your frontend URL
+  credentials: true,
+}));
+app.use(express.urlencoded({
   extended:true
 }))
 
-const newsRoutes = require("./routes/newsRoutes");
-const userRoutes = require("./routes/userRoutes")
-const categoryRoutes = require("./routes/categoryRoutes")
-
+//routes
 app.use('/news', newsRoutes)
 app.use('/users',userRoutes)
 app.use("/categories", categoryRoutes);
@@ -37,6 +43,12 @@ app.use("/categories", categoryRoutes);
 app.get("/", (req, res) => {
   res.send("hello world");
 });
+async function syncDb(){
+
+  await sequelize.sync({ force: true });
+  console.log('All models were synchronized successfully.');
+}
+// syncDb()
 
 app.listen(PORT, () => {
   console.log(`app is listening on port https://localhost:${PORT}`);
