@@ -9,9 +9,10 @@ const {
   getNewsCounts,
 } = require("../controllers/newsController");
 const upload = require('../middlleware/multer')
+const isAdmin = require("../middlleware/adminAuth");
 
 // Create news
-router.post("/create", upload.single("image"), createNews);
+router.post("/", upload.single("image"), createNews);
 
 // Get all news
 router.get("", getAllNews);

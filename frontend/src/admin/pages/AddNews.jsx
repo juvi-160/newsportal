@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios'; 
+
 
 const AddNews = () => {
   const navigate = useNavigate();
@@ -7,44 +9,71 @@ const AddNews = () => {
     title: '',
     publisherName: '',
     description: '',
-    image: '',
+    image: null,
     categoryId: '',
-    publishedAt: new Date().toISOString().slice(0, 16) // Default to current datetime
+    publishedAt: new Date().toISOString().slice(0, 16),
   });
 
   const [errors, setErrors] = useState({});
-  const [categories] = useState([
-    { id: 1, name: 'Technology' },
-    { id: 2, name: 'Business' },
-    { id: 3, name: 'Health' },
-    { id: 4, name: 'Sports' },
-    { id: 5, name: 'Entertainment' }
-  ]);
+  const [categories, setCategories] = useState([]);
+
+  // -------------------------------
+  // API ENDPOINTS
+  const BASE_URL = 'http://localhost:3000'; // Change to your actual base URL
+  const getCategories = async () => {
+    return await axios.get(`${BASE_URL}/categories`);
+  };
+
+  const createNews = async (data) => {
+    return await axios.post(`${BASE_URL}/news`, data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  };
+  // -------------------------------
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await getCategories();
+        console.log("Fetched categories:", response);
+
+        const categoryList = Array.isArray(response.data)
+          ? response.data
+          : response.data.categories || [];
+
+        setCategories(categoryList);
+      } catch (err) {
+        console.error("Error fetching categories:", err);
+        setCategories([]);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-    // Clear error when user starts typing
+    const { name, value, files } = e.target;
+    if (name === 'image') {
+      setFormData({ ...formData, image: files[0] });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+
     if (errors[name]) {
-      setErrors({
-        ...errors,
-        [name]: null
-      });
+      setErrors({ ...errors, [name]: null });
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validate form
+
     const newErrors = {};
     if (!formData.title.trim()) newErrors.title = 'Title is required';
     if (!formData.publisherName.trim()) newErrors.publisherName = 'Publisher name is required';
     if (!formData.description.trim()) newErrors.description = 'Description is required';
-    if (!formData.image.trim()) newErrors.image = 'Image URL is required';
+    if (!formData.image) newErrors.image = 'Image is required';
     if (!formData.categoryId) newErrors.categoryId = 'Category is required';
 
     if (Object.keys(newErrors).length > 0) {
@@ -52,18 +81,29 @@ const AddNews = () => {
       return;
     }
 
-    // Submit logic would go here (API call, etc.)
-    console.log('Form submitted:', formData);
-    
-    // For now, just navigate back to news list
-    navigate('/news');
+    try {
+      const submissionData = new FormData();
+      submissionData.append('title', formData.title);
+      submissionData.append('publisherName', formData.publisherName);
+      submissionData.append('description', formData.description);
+      submissionData.append('image', formData.image);
+      submissionData.append('categoryId', formData.categoryId);
+      submissionData.append('publishedAt', formData.publishedAt);
+
+      const response = await createNews(submissionData);
+      console.log(response);
+      navigate('/admin/news');
+    } catch (err) {
+      console.error('News submission failed:', err.response || err.message);
+      alert('Failed to create news. Please try again.');
+    }
   };
 
   return (
     <div className="p-6 max-w-4xl mx-auto mt-15">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Add New News</h1>
-        <button 
+        <button
           onClick={() => navigate('/admin/news')}
           className="text-gray-600 hover:text-gray-800 flex items-center gap-1"
         >
@@ -78,9 +118,7 @@ const AddNews = () => {
         <div className="grid grid-cols-1 gap-6">
           {/* Title */}
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-              Title *
-            </label>
+            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
             <input
               type="text"
               id="title"
@@ -95,9 +133,7 @@ const AddNews = () => {
 
           {/* Publisher Name */}
           <div>
-            <label htmlFor="publisherName" className="block text-sm font-medium text-gray-700 mb-1">
-              Publisher Name *
-            </label>
+            <label htmlFor="publisherName" className="block text-sm font-medium text-gray-700 mb-1">Publisher Name *</label>
             <input
               type="text"
               id="publisherName"
@@ -112,9 +148,7 @@ const AddNews = () => {
 
           {/* Description */}
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-              Description *
-            </label>
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
             <textarea
               id="description"
               name="description"
@@ -127,28 +161,23 @@ const AddNews = () => {
             {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
           </div>
 
-          {/* Image URL */}
+          {/* Image */}
           <div>
-            <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">
-              Image *
-            </label>
+            <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">Image *</label>
             <input
               type="file"
               id="image"
               name="image"
-              value={formData.image}
+              accept="image/*"
               onChange={handleChange}
               className={`w-full px-3 py-2 border rounded-md ${errors.image ? 'border-red-500' : 'border-gray-300'}`}
-            
             />
             {errors.image && <p className="mt-1 text-sm text-red-600">{errors.image}</p>}
           </div>
 
           {/* Category */}
           <div>
-            <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700 mb-1">
-              Category *
-            </label>
+            <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
             <select
               id="categoryId"
               name="categoryId"
@@ -157,10 +186,8 @@ const AddNews = () => {
               className={`w-full px-3 py-2 border rounded-md ${errors.categoryId ? 'border-red-500' : 'border-gray-300'}`}
             >
               <option value="">Select a category</option>
-              {categories.map(category => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
+              {Array.isArray(categories) && categories.map(category => (
+                <option key={category.id} value={category.id}>{category.name}</option>
               ))}
             </select>
             {errors.categoryId && <p className="mt-1 text-sm text-red-600">{errors.categoryId}</p>}
@@ -168,9 +195,7 @@ const AddNews = () => {
 
           {/* Published At */}
           <div>
-            <label htmlFor="publishedAt" className="block text-sm font-medium text-gray-700 mb-1">
-              Published Date & Time
-            </label>
+            <label htmlFor="publishedAt" className="block text-sm font-medium text-gray-700 mb-1">Published Date & Time</label>
             <input
               type="datetime-local"
               id="publishedAt"
@@ -181,12 +206,9 @@ const AddNews = () => {
             />
           </div>
 
-          {/* Submit Button */}
+          {/* Submit */}
           <div className="flex justify-end">
-            <button
-              type="submit"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors"
-            >
+            <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors">
               Add News
             </button>
           </div>

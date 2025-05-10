@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getNewsCounts } from '../services/api';
+import axios from 'axios'; // Import axios
 import StatsCard from './StatsCard';
 
 const NewsStats = ({ category, title }) => {
@@ -11,7 +11,7 @@ const NewsStats = ({ category, title }) => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await getNewsCounts();
+        const response = await axios.get(`http://localhost:3000/news/count`); // Full backend URL
         
         if (response.data.success) {
           // For total count use response.data.total

@@ -1,20 +1,54 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const Category = () => {
-  // Sample category data - replace with your actual data
-  const [categories, setCategories] = useState([
-    { id: 1, name: 'Technology', createdAt: '2023-05-01', newsCount: 24 },
-    { id: 2, name: 'Business', createdAt: '2023-05-05', newsCount: 18 },
-    { id: 3, name: 'Health', createdAt: '2023-05-10', newsCount: 12 },
-    { id: 4, name: 'Sports', createdAt: '2023-05-15', newsCount: 32 },
-    { id: 5, name: 'Entertainment', createdAt: '2023-05-20', newsCount: 45 },
-  ]);
+  const [categories, setCategories] = useState([]);
+  const [editId, setEditId] = useState(null);
+  const [editName, setEditName] = useState('');
 
-  const handleDelete = (id) => {
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/categories');
+        setCategories(response.data.categories || []);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this category?')) {
-      setCategories(categories.filter(category => category.id !== id));
-      // In a real app, you would call your API here
+      try {
+        await axios.delete(`http://localhost:3000/categories/${id}`);
+        setCategories(categories.filter(category => category.id !== id));
+        alert('Category deleted successfully!');
+      } catch (error) {
+        console.error('Error deleting category:', error);
+        alert('Failed to delete category.');
+      }
+    }
+  };
+
+  const handleEdit = (id, currentName) => {
+    setEditId(id);
+    setEditName(currentName);
+  };
+
+  const handleUpdate = async (id) => {
+    try {
+      await axios.put(`http://localhost:3000/categories/${id}`, { name: editName });
+      setCategories(prev =>
+        prev.map(category => category.id === id ? { ...category, name: editName } : category)
+      );
+      setEditId(null);
+      alert('Category updated successfully!');
+    } catch (error) {
+      console.error('Error updating category:', error);
+      alert('Failed to update category.');
     }
   };
 
@@ -45,28 +79,65 @@ const Category = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {categories.map((category) => (
-              <tr key={category.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{category.id}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{category.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{category.createdAt}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{category.newsCount}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <Link 
-                    to={`/edit-category/${category.id}`} 
-                    className="text-blue-600 hover:text-blue-900 mr-3 hover:underline"
-                  >
-                    Edit
-                  </Link>
-                  <button 
-                    onClick={() => handleDelete(category.id)}
-                    className="text-red-600 hover:text-red-900 hover:underline"
-                  >
-                    Delete
-                  </button>
-                </td>
+            {categories.length === 0 ? (
+              <tr>
+                <td colSpan="5" className="text-center py-6 text-gray-500">No categories found.</td>
               </tr>
-            ))}
+            ) : (
+              categories.map((category) => (
+                <tr key={category.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{category.id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {editId === category.id ? (
+                      <input
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        className="border px-2 py-1 rounded w-full"
+                      />
+                    ) : (
+                      category.name
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {new Date(category.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{category.newsCount || 0}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                    {editId === category.id ? (
+                      <>
+                        <button
+                          onClick={() => handleUpdate(category.id)}
+                          className="text-green-600 hover:text-green-900 hover:underline"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={() => setEditId(null)}
+                          className="text-gray-600 hover:text-gray-900 hover:underline"
+                        >
+                          Cancel
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => handleEdit(category.id, category.name)}
+                          className="text-blue-600 hover:text-blue-900 hover:underline"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(category.id)}
+                          className="text-red-600 hover:text-red-900 hover:underline"
+                        >
+                          Delete
+                        </button>
+                      </>
+                    )}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

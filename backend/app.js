@@ -34,15 +34,17 @@ app.use(cors({  origin: 'http://localhost:5173', // Your frontend URL
 app.use(express.urlencoded({
   extended:true
 }))
+app.use('/uploads', express.static('uploads')) // Serve static files from the 'uploads' directory
 
 //routes
 app.use('/news', newsRoutes)
-app.use('/users',userRoutes)
+app.use('/admin',userRoutes)
 app.use("/categories", categoryRoutes);
 
 app.get("/", (req, res) => {
   res.send("hello world");
 });
+
 async function syncDb(){
 
   await sequelize.sync({ force: true });

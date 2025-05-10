@@ -1,38 +1,56 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const NewsAll = () => {
-  // Sample news data
-  const newsData = [
-    {
-      id: 1,
-      title: 'Breaking News: React 19 Released',
-      category: 'Technology',
-      date: '2023-05-15',
-      views: 1542,
-      status: 'Published'
-    },
-    {
-      id: 2,
-      title: 'Economic Growth Reaches 5%',
-      category: 'Business',
-      date: '2023-05-10',
-      views: 892,
-      status: 'Published'
-    },
-    {
-      id: 3,
-      title: 'New Health Guidelines Announced',
-      category: 'Health',
-      date: '2023-05-05',
-      views: 1245,
-      status: 'Draft'
-    },
-  ];
+  const [newsData, setNewsData] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch all news
+  const fetchNews = async () => {
+    try {
+      const res = await axios.get('http://localhost:3000/news'); // Adjust the API route as needed
+      setNewsData(res.data);
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching news:", err);
+      setLoading(false);
+    }
+  };
+
+  // Fetch all categories
+  const fetchCategories = async () => {
+  try {
+    const res = await axios.get('http://localhost:3000/categories');
+    setCategories(res.data.categories); // FIX HERE
+  } catch (err) {
+    console.error("Error fetching categories:", err);
+  }
+};
+
+  // Handle deletion
+  const handleDelete = async (id) => {
+    const confirm = window.confirm('Are you sure you want to delete this news item?');
+    if (!confirm) return;
+
+    try {
+      await axios.delete(`http://localhost:3000/news/${id}`); // Adjust the delete route
+      setNewsData(newsData.filter(news => news.id !== id));
+    } catch (err) {
+      console.error("Error deleting news:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchNews();
+    fetchCategories();
+  }, []);
+
+  if (loading) return <p className="text-center mt-10 text-gray-500">Loading news...</p>;
 
   return (
     <div className="p-6 mt-20">
-      {/* Header with title and ADD NEWS button on the right */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">All News</h1>
         <Link 
@@ -46,55 +64,46 @@ const NewsAll = () => {
         </Link>
       </div>
 
-      {/* News Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Views</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {newsData.map((news) => (
-              <tr key={news.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{news.id}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{news.title}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{news.category}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{news.date}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{news.views}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    news.status === 'Published' 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {news.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <Link 
-                    to={`/edit-news/${news.id}`} 
-                    className="text-blue-600 hover:text-blue-900 mr-3 hover:underline"
-                  >
-                    Edit
-                  </Link>
-                  <button className="text-red-600 hover:text-red-900 hover:underline">
-                    Delete
-                  </button>
-                </td>
+            {newsData.length > 0 ? (
+              newsData.map((news) => {
+                const category = categories.find(cat => cat.id === news.categoryId); // Assuming `categoryId` is the key
+                return (
+                  <tr key={news.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 text-sm text-gray-500">{news.id}</td>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{news.title}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{category ? category.name : 'N/A'}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{new Date(news.createdAt).toLocaleDateString()}</td>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900 flex gap-2">
+                      <Link to={`/admin/news/${news.id}`} className="text-indigo-600 hover:text-indigo-900">
+                        Edit
+                      </Link>
+                      <button onClick={() => handleDelete(news.id)} className="text-red-600 hover:text-red-900">
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan="5" className="text-center px-6 py-4 text-gray-500">No news available</td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
-
-      {/* Optional: Pagination would go here */}
     </div>
   );
 };

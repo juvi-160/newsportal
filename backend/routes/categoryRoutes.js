@@ -3,10 +3,10 @@ const router = express.Router();
 const Category = require("../models/categoryModel");
 
 //create
-router.post("/", async (req, res) => {
+router.post("/create", async (req, res) => {
   try {
     const category = await Category.create({ name: req.body.name });
-    res.json({ sucess: true, category });
+    res.json({ success: true, category });
   } catch (error) {
     res.json({ sucess: false, message: error.message });
   }
@@ -16,12 +16,12 @@ router.post("/", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const categories = await Category.findAll({
-      order: [['createdAt', 'DESC']] // Optional: sort by creation date
+      order: [['createdAt', 'DESC']] 
     });
     res.json({ 
       success: true, 
       categories,
-      count: categories.length // Include count in the response
+      count: categories.length 
     });
   } catch (error) {
     res.status(500).json({ 

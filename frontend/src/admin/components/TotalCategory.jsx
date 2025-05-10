@@ -10,8 +10,8 @@ const TotalCategory = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('/categories/count'); // Correct endpoint
-        setCount(response.data.count); // Directly use the count value
+        const response = await axios.get('http://localhost:3000/categories/count'); // Full backend URL
+        setCount(response.data.count);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching category count:", err);

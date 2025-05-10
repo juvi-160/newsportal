@@ -15,6 +15,7 @@ import Layout from './components/Layout.jsx'
 import Layout2 from './admin/components/Layout.jsx'
 import AddNews from './admin/pages/AddNews.jsx'
 import AddCategory from './admin/pages/AddCategory.jsx'
+import UpdateNews from './admin/pages/UpdateNews.jsx'
 
 
 
@@ -37,6 +38,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="news" element={<NewsAll />} />
           <Route path="addNews" element={<AddNews />} />
           <Route path="addCategory" element={<AddCategory />} />
+          <Route path="news/:id" element={<UpdateNews />} />
           </Route>
 
       </Routes>

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const backendUrl = "http://localhost:3000";
+const backendUrl = import.meta.env.VITE_BACKEND_URL ;
 
 const api = axios.create({
   baseURL: backendUrl,
@@ -21,7 +21,10 @@ api.interceptors.request.use((config) => {
 // Categories
 export const getCategories = () => api.get('/categories');
 export const getCategoryCount = () => api.get('/categories/count');
-export const createCategory = (name) => api.post('/categories', { name });
+export const createCategory = (name) => api.post('/categories/create', { name });
+export const deleteCategory = (id) => api.delete(`/categories/${id}`);
+export const updateCategory = (id, name) => api.put(`/categories/${id}`, { name });
+export const getCategoryById = (id) => api.get(`/categories/${id}`);
 
 // News
 export const getAllNews = () => api.get('/news');
@@ -32,6 +35,13 @@ export const createNews = (formData) => api.post('/news/create', formData, {
     'Content-Type': 'multipart/form-data',
   },
 });
+export const updateNews = (id, formData) => api.put(`/news/${id}`, formData, {
+  headers: {
+    'Content-Type': 'multipart/form-data',
+  },
+});
+export const deleteNews = (id) => api.delete(`/news/${id}`);
+export const getNewsById = (id) => api.get(`/news/${id}`);
 
 // Auth
 export const login = (email, password) => api.post('/users/login', { email, password });

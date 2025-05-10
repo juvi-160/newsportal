@@ -1,14 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
-const sequelize = require('../config/db');
-const User = require("../models/userModel");
-
-// Sync DB
-sequelize
-.sync({ alter: true })
-.then(() => console.log("Database & tables synced!"))
-.catch((err) => console.error("Error syncing database:", err.message));
 
 // Create JWT token
 const createToken = (email) => {
