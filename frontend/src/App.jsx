@@ -18,18 +18,12 @@ const App = () => {
     <Title title="LATEST INDIA NEWS"/>
     <div className='grid grid-cols-4 gap-4 pr-10 pl-10  pt-5'>
       <LatestIndia/>
-      <LatestIndia/>
-      <LatestIndia/>
-      <LatestIndia/>
     </div>
   </div>
 
   <div className='mb-10'>
     <Title title="LATEST WORLD NEWS"/>
     <div className='grid grid-cols-4 gap-4 pr-10 pl-10  pt-5'>
-      <LatestWorld/>
-      <LatestWorld/>
-      <LatestWorld/>
       <LatestWorld/>
     </div>
   </div>
@@ -38,17 +32,11 @@ const App = () => {
     <Title title="LATEST SPORTS NEWS"/>
     <div className='grid grid-cols-4 gap-4 pr-10 pl-10  pt-5'>
       <LatestSports/>
-      <LatestSports/>
-      <LatestSports/>
-      <LatestSports/>
     </div>
   </div>
   <div className='mb-10'>
     <Title title="LATEST BUSINESS NEWS"/>
     <div className='grid grid-cols-4 gap-4 pr-10 pl-10  pt-5'>
-      <LatestBusiness/>
-      <LatestBusiness/>
-      <LatestBusiness/>
       <LatestBusiness/>
     </div>
   </div>
