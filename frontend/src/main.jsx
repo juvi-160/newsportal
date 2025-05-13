@@ -16,6 +16,9 @@ import Layout2 from './admin/components/Layout.jsx'
 import AddNews from './admin/pages/AddNews.jsx'
 import AddCategory from './admin/pages/AddCategory.jsx'
 import UpdateNews from './admin/pages/UpdateNews.jsx'
+import NewsDetail from './pages/NewsDetail.jsx'
+import ProtectedRoute from './admin/components/ProtectedRoute.jsx'
+
 
 
 
@@ -30,15 +33,16 @@ createRoot(document.getElementById('root')).render(
           <Route path='/sports' element={<Sports />} />
           <Route path='/world' element={<World />} />
           <Route path='/business' element={<Business />} />
+          <Route path='/news/:id' element={<NewsDetail />} />
           <Route path='/login' element={<Login />} />
         </Route>
-        <Route path="/admin" element={<Layout2 />}>
-          <Route index element={<Admin />} />
-          <Route path="category" element={<Category />} />
-          <Route path="news" element={<NewsAll />} />
-          <Route path="addNews" element={<AddNews />} />
-          <Route path="addCategory" element={<AddCategory />} />
-          <Route path="news/:id" element={<UpdateNews />} />
+        <Route path="/admin" element={<ProtectedRoute><Layout2 /></ProtectedRoute>}>
+          <Route index element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+          <Route path="category" element={<ProtectedRoute><Category /></ProtectedRoute>} />
+          <Route path="news" element={<ProtectedRoute><NewsAll /></ProtectedRoute>} />
+          <Route path="addNews" element={<ProtectedRoute><AddNews /></ProtectedRoute>} />
+          <Route path="addCategory" element={<ProtectedRoute><AddCategory /></ProtectedRoute>} />
+          <Route path="news/:id" element={<ProtectedRoute><UpdateNews /></ProtectedRoute>} />
           </Route>
 
       </Routes>

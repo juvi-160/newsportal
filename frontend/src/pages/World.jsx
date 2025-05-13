@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Title from '../components/Title';
+import { Link } from 'react-router-dom';
 
 const World = () => {
   const [newsData, setNewsData] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -14,7 +16,7 @@ const World = () => {
         setLoading(true);
         const response = await axios.get('http://localhost:3000/news');
         console.log(response.data); // should be an array
-       const worldNews = response.data.filter(newsItem => newsItem.categoryId === 4);
+        const worldNews = response.data.filter(newsItem => newsItem.categoryId === 2);
 
         setNewsData(worldNews);
       } catch (err) {
@@ -24,9 +26,23 @@ const World = () => {
         setLoading(false);
       }
     };
+
+    const fetchCategories = async () => {
+      try {
+        const res = await axios.get('http://localhost:3000/categories');
+        setCategories(res.data.categories);
+      } catch (err) {
+        console.error("Error fetching categories:", err);
+      }
+    };
     fetchNews();
+    fetchCategories();
   }, []);
 
+  const getCategoryName = (categoryId) => {
+    const category = categories.find(cat => cat.id === categoryId);
+    return category ? category.name : 'N/A';
+  };
 
   if (loading) return <div className="text-center mt-10 text-gray-600">Loading...</div>;
   if (error) return <div className="text-center mt-10 text-red-500">{error}</div>;
@@ -44,18 +60,23 @@ const World = () => {
               <div className="flex flex-col md:flex-row gap-6 p-6">
                 <div className="flex-shrink-0">
                   <img
-                    src={newsItem.image || 'https://via.placeholder.com/300x200?text=No+Image'}
+                    src={`http://localhost:3000/uploads/${newsItem.image}` || 'https://via.placeholder.com/300x200?text=No+Image'}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
+                    }}
                     alt="News"
                     className="h-60 w-full object-cover md:w-80 rounded-md"
                   />
+
                 </div>
 
                 <div className="flex flex-col justify-center">
                   <h2 className="text-xl font-bold mb-2 text-gray-800">{newsItem.title}</h2>
-                  <p className="text-gray-700 mb-4">{newsItem.description}</p>
-                  <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300 w-fit">
+                  <h2 className="text-sm font-semibold mb-2 text-gray-600">{getCategoryName(newsItem.categoryId)}</h2>
+                  <Link to={`/news/${newsItem.id}`} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300 w-fit">
                     READ MORE
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>

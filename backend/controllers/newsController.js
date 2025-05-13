@@ -1,4 +1,4 @@
-// const sequelize = require('../config/db');
+//const sequelize = require('../config/db');
 const News = require("../models/newsModel");
 const Category = require("../models/categoryModel")
 

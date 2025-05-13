@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Title from '../components/Title';
+import { Link } from 'react-router-dom';
 
 const Business = () => {
   const [newsData, setNewsData] = useState([]);
@@ -14,7 +15,7 @@ const Business = () => {
         setLoading(true);
         const response = await axios.get('http://localhost:3000/news');
         console.log(response.data); // should be an array
-       const worldNews = response.data.filter(newsItem => newsItem.categoryId === 9);
+        const worldNews = response.data.filter(newsItem => newsItem.categoryId === 4);
 
         setNewsData(worldNews);
       } catch (err) {
@@ -34,7 +35,7 @@ const Business = () => {
   return (
     <div className="mt-5 mb-10 px-4 sm:px-10">
       <div className="mb-6">
-        <Title title="WORLD NEWS" />
+        <Title title="BUSINESS NEWS" />
       </div>
 
       <div className="grid grid-cols-1 gap-8">
@@ -44,18 +45,22 @@ const Business = () => {
               <div className="flex flex-col md:flex-row gap-6 p-6">
                 <div className="flex-shrink-0">
                   <img
-                    src={newsItem.image || 'https://via.placeholder.com/300x200?text=No+Image'}
+                    src={`http://localhost:3000/uploads/${newsItem.image}` || 'https://via.placeholder.com/300x200?text=No+Image'}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
+                    }}
                     alt="News"
                     className="h-60 w-full object-cover md:w-80 rounded-md"
                   />
+
                 </div>
 
                 <div className="flex flex-col justify-center">
                   <h2 className="text-xl font-bold mb-2 text-gray-800">{newsItem.title}</h2>
-                  <p className="text-gray-700 mb-4">{newsItem.description}</p>
-                  <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300 w-fit">
+                  <Link to={`/news/${newsItem.id}`} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300 w-fit">
                     READ MORE
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>

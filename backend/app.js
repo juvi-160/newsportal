@@ -47,10 +47,10 @@ app.get("/", (req, res) => {
 
 async function syncDb(){
 
-  await sequelize.sync({ force: true });
+  await sequelize.sync({ alter: true });
   console.log('All models were synchronized successfully.');
 }
-// syncDb()
+//syncDb()
 
 app.listen(PORT, () => {
   console.log(`app is listening on port https://localhost:${PORT}`);

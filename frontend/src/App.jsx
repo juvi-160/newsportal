@@ -14,29 +14,29 @@ const App = () => {
     <LatestNews/>
   </div>
 
-  <div className='mb-10'>
+  <div className='mb-10 mt-10'>
     <Title title="LATEST INDIA NEWS"/>
-    <div className='grid grid-cols-4 gap-4 pr-10 pl-10  pt-5'>
+    <div>
       <LatestIndia/>
     </div>
   </div>
 
   <div className='mb-10'>
     <Title title="LATEST WORLD NEWS"/>
-    <div className='grid grid-cols-4 gap-4 pr-10 pl-10  pt-5'>
+    <div>
       <LatestWorld/>
     </div>
   </div>
 
   <div className='mb-10'>
     <Title title="LATEST SPORTS NEWS"/>
-    <div className='grid grid-cols-4 gap-4 pr-10 pl-10  pt-5'>
+    <div>
       <LatestSports/>
     </div>
   </div>
   <div className='mb-10'>
     <Title title="LATEST BUSINESS NEWS"/>
-    <div className='grid grid-cols-4 gap-4 pr-10 pl-10  pt-5'>
+    <div>
       <LatestBusiness/>
     </div>
   </div>
