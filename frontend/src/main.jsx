@@ -37,7 +37,7 @@ createRoot(document.getElementById('root')).render(
           <Route path='/login' element={<Login />} />
         </Route>
         <Route path="/admin" element={<ProtectedRoute><Layout2 /></ProtectedRoute>}>
-          <Route index element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+          <Route index element={<Admin />} />
           <Route path="category" element={<ProtectedRoute><Category /></ProtectedRoute>} />
           <Route path="news" element={<ProtectedRoute><NewsAll /></ProtectedRoute>} />
           <Route path="addNews" element={<ProtectedRoute><AddNews /></ProtectedRoute>} />

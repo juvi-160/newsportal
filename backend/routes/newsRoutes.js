@@ -12,7 +12,7 @@ const upload = require('../middlleware/multer')
 const isAdmin = require("../middlleware/adminAuth");
 
 // Create news
-router.post("/", upload.single("image"), createNews);
+router.post("/", upload.single("image"), isAdmin, createNews);
 
 // Get all news
 router.get("", getAllNews);
