@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 
 const Business = () => {
   const [newsData, setNewsData] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -25,9 +26,23 @@ const Business = () => {
         setLoading(false);
       }
     };
+    const fetchCategories = async () => {
+      try {
+        const res = await axios.get('http://localhost:3000/categories');
+        setCategories(res.data.categories);
+      } catch (err) {
+        console.error("Error fetching categories:", err);
+      }
+    };
+
     fetchNews();
+    fetchCategories();
   }, []);
 
+  const getCategoryName = (categoryId) => {
+    const category = categories.find(cat => cat.id === categoryId);
+    return category ? category.name : 'N/A';
+  };
 
   if (loading) return <div className="text-center mt-10 text-gray-600">Loading...</div>;
   if (error) return <div className="text-center mt-10 text-red-500">{error}</div>;
@@ -58,6 +73,7 @@ const Business = () => {
 
                 <div className="flex flex-col justify-center">
                   <h2 className="text-xl font-bold mb-2 text-gray-800">{newsItem.title}</h2>
+                  <h2 className="text-sm font-semibold mb-2 text-gray-600">{getCategoryName(newsItem.categoryId)}</h2>
                   <Link to={`/news/${newsItem.id}`} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300 w-fit">
                     READ MORE
                   </Link>

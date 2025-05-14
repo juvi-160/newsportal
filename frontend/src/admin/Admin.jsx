@@ -3,8 +3,6 @@ import NewsStats from './components/NewsStats.jsx';
 import TotalCategory from './components/TotalCategory.jsx';
 
 const Admin = () => {
-
-
   return (
     <div className='p-4 pt-20'>
       <div className='font-bold text-2xl pb-8'>
